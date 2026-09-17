@@ -1,0 +1,13 @@
+# 1. تحميل المستودع
+git clone https://github.com/ayttop/suc-vibe-coding.git
+cd suc-vibe-coding
+
+# 2. تشغيل الـ Backend
+cd backend
+npm install
+npm run dev
+
+# 3. تشغيل الـ Frontend (في نافذة PowerShell ثانية)
+cd ..\frontend
+npm install
+npm run dev
