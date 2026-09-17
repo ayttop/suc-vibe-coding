@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Reachy Mini · Vibe Coding Apps</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <!--
+      HF Spaces OAuth helper variables.
+
+      On `sdk: docker`, HF exposes OAUTH_CLIENT_ID / SPACE_HOST / SPACE_ID as
+      server-side env vars. We have nginx substitute them into this script at
+      container startup via `docker-entrypoint.d/10-inject-hf-vars.sh`.
+
+      Locally (`npm run dev`) the placeholders stay untouched; the app then
+      reads the client ID from VITE_HF_OAUTH_CLIENT_ID (set in `.env.local`).
+    -->
+    <script>
+      (function () {
+        var clientId = "__OAUTH_CLIENT_ID__";
+        var scopes = "__OAUTH_SCOPES__";
+        var spaceHost = "__SPACE_HOST__";
+        var spaceId = "__SPACE_ID__";
+        var looksSubstituted = clientId && clientId.indexOf("__") !== 0;
+        if (looksSubstituted) {
+          window.huggingface = window.huggingface || {};
+          window.huggingface.variables = {
+            OAUTH_CLIENT_ID: clientId,
+            OAUTH_SCOPES:
+              scopes && scopes.indexOf("__") !== 0
+                ? scopes
+                : "openid profile write-repos manage-repos",
+            SPACE_HOST: spaceHost && spaceHost.indexOf("__") !== 0 ? spaceHost : "",
+            SPACE_ID: spaceId && spaceId.indexOf("__") !== 0 ? spaceId : "",
+          };
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci || npm install
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Unit + hook tests (Vitest)
+        run: npm run test
+      - name: Production build (build-time gate)
+        run: npm run build
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+      - name: Preview smoke (Playwright)
+        run: npm run test:e2e
+
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci || npm install
+      - name: Typecheck / build
+        run: npm run build
+      - name: Unit tests (node:test)
+        run: npm test
+
+# TODO(live-model-evals): add a promptfoo/DeepEval job that runs the agent
+# against a rubric (does a generated app use mountHost/connectToHost, stay
+# 3-file/static, avoid over-commenting, etc.). Out of scope here - needs a
+# model key and a cost budget; keep it in a separate, manually-triggered
+# workflow so PR CI stays fast and deterministic.
